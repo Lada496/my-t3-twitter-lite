@@ -1,9 +1,15 @@
+import { EventEmitter } from "events";
 import { z } from "zod";
+import { observable } from "@trpc/server/observable";
+import { type Tweet } from "@prisma/client";
 import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+
+// create a global event emitter (could be replaced by redis, etc)
+const ee = new EventEmitter();
 
 export const tweetRouter = createTRPCRouter({
   all: publicProcedure.query(({ ctx }) => {
@@ -14,6 +20,9 @@ export const tweetRouter = createTRPCRouter({
         createdAt: true,
         userId: true,
         user: { select: { name: true } },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
   }),
@@ -30,6 +39,9 @@ export const tweetRouter = createTRPCRouter({
           createdAt: true,
           userId: true,
           user: { select: { name: true } },
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       });
     }),
@@ -55,4 +67,20 @@ export const tweetRouter = createTRPCRouter({
 
       return deletedTweet;
     }),
+  onUpdate: publicProcedure.subscription(() => {
+    // return an `observable` with a callback which is triggered immediately
+    return observable<Tweet>((emit) => {
+      const onAdd = (data: Tweet) => {
+        // emit data to client
+        emit.next(data);
+      };
+      // trigger `onAdd()` when `add` is triggered in our event emitter
+      ee.on("add", onAdd);
+
+      // unsubscribe function when client disconnects or stops subscribing
+      return () => {
+        ee.off("add", onAdd);
+      };
+    });
+  }),
 });

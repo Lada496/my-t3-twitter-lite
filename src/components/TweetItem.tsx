@@ -5,14 +5,30 @@ import { type RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
 
 type ArryItems<T> = T extends (infer Item)[] ? Item : T;
-type TweetItem = ArryItems<RouterOutputs["tweet"]["oneUser"]>;
-type TweetItemProps = {
-  tweet: Pick<TweetItem, "id" | "content" | "createdAt" | "userId" | "user">;
-};
+type TweetItemProps = ArryItems<RouterOutputs["tweet"]["oneUser"]>;
 
-function TweetItem({ tweet }: TweetItemProps) {
+function TweetItem({ tweet }: { tweet: TweetItemProps }) {
   const { data: sessionData } = useSession();
-  const mutation = api.tweet.delete.useMutation();
+  const utils = api.useContext();
+  const mutation = api.tweet.delete.useMutation({
+    async onMutate(id) {
+      await utils.tweet.oneUser.cancel();
+      const prevData = utils.tweet.oneUser.getData({ id: tweet.userId });
+
+      utils.tweet.oneUser.setData({ id: tweet.userId }, (old) =>
+        old?.filter((tweet) => tweet.id !== id)
+      );
+      return { prevData };
+    },
+    onError(err, id, ctx) {
+      // If the mutation fails, use the context-value from onMutate
+      utils.tweet.oneUser.setData({ id: tweet.userId }, ctx?.prevData);
+    },
+    async onSettled() {
+      // Sync with server once mutation has settled
+      await utils.tweet.oneUser.invalidate();
+    },
+  });
   const handleDelete = () => {
     if (confirm("Are you sure to delete the tweet?")) {
       mutation.mutate({ id: tweet.id });

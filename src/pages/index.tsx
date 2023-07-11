@@ -1,16 +1,25 @@
+import { useEffect, useState } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import { api } from "~/utils/api";
-import TweetItem from "~/components/tweetItem";
-import Header from "~/components/Header";
+import TweetItem from "~/components/TweetItem";
+import { type RouterOutputs } from "~/utils/api";
+type Tweets = RouterOutputs["tweet"]["all"];
 
 export default function Home() {
-  const { data: tweets } = api.tweet.all.useQuery();
+  const { data } = api.tweet.all.useQuery<Tweets>();
+  const [tweets, setTweets] = useState<Tweets>([]);
 
-  console.log(tweets);
-  tweets?.map((tweet) => {
-    console.log(tweet);
+  api.tweet.onUpdate.useSubscription(undefined, {
+    onData(tweet) {
+      setTweets((prev) => [tweet, ...prev]);
+    },
   });
+
+  useEffect(() => {
+    if (data) {
+      setTweets(data);
+    }
+  }, [data]);
 
   return (
     <>
@@ -22,10 +31,7 @@ export default function Home() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* <main className="flex min-h-screen flex-col items-center justify-center bg-white"> */}
       <div className="container mx-auto px-4 py-16">
-        {/* <Header title="Tweets" /> */}
-
         <div className="mt-8 flex w-full flex-col items-center gap-4">
           {tweets ? (
             tweets.length === 0 ? (
@@ -42,7 +48,6 @@ export default function Home() {
           )}
         </div>
       </div>
-      {/* </main> */}
     </>
   );
 }

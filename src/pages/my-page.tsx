@@ -9,7 +9,7 @@ export default function MyPage() {
       {sessionData ? (
         <>
           {sessionData && <MyTweetsList id={sessionData.user.id} />}
-          <Form />
+          <Form user={sessionData.user} />
         </>
       ) : (
         <p>Please sign in to access your tweets</p>
