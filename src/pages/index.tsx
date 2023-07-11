@@ -42,7 +42,9 @@ export default function Home() {
               <p className="text-2xl text-blue-700">Loading...</p>
             )}
           </div>
-          <Link href="/my-page">Go to my page</Link>
+          <Link href="/my-page" className="text-blue-500 hover:underline">
+            Go to my page
+          </Link>
         </div>
       </main>
     </>

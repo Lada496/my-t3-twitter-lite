@@ -1,7 +1,8 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import MyTweetsList from "~/components/MyTweetsList";
 import Form from "~/components/Form";
-export default function AuthPage() {
+export default function MyPage() {
   const { data: sessionData } = useSession();
 
   return (
@@ -21,6 +22,9 @@ export default function AuthPage() {
       >
         {sessionData ? "Sign out" : "Sign in"}
       </button>
+      <Link href="/" className="text-blue-500 hover:underline">
+        Go to home page
+      </Link>
     </div>
   );
 }

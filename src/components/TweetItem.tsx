@@ -17,8 +17,8 @@ function TweetItem({ tweet }: TweetItemProps) {
   };
 
   return (
-    <div className="rounded-lg bg-blue-50 p-4 shadow-md">
-      <p className="text-lg font-semibold text-blue-700">
+    <div className="rounded-lg bg-white p-4 shadow-md">
+      <p className="text-lg font-semibold text-blue-500">
         {tweet.user.name} - {tweet.createdAt.toDateString()}
       </p>
       <p className="text-gray-700">{tweet.content}</p>
