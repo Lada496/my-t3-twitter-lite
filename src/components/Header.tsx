@@ -4,12 +4,12 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 const Header = () => {
-  const router = useRouter();
+  const { pathname } = useRouter();
   const { data: sessionData } = useSession();
   return (
-    <header className="m-6 flex w-full items-center justify-between px-6">
+    <header className="m-6 box-border flex w-screen items-center justify-between">
       <h1 className="text-5xl font-extrabold tracking-tight text-blue-700 sm:text-6xl">
-        {router.pathname === "/my-page" ? "My Tweets" : "Tweets"}
+        {pathname === "/my-page" ? "My Tweets" : "Tweets"}
       </h1>
       <nav>
         <ul className="flex items-center space-x-4">
@@ -21,7 +21,7 @@ const Header = () => {
           </li>
           <li>
             <button
-              className="rounded bg-blue-500 px-4 py-2 font-semibold text-white"
+              className="mr-6 rounded bg-blue-500 px-4 py-2 font-semibold text-white"
               onClick={sessionData ? () => void signOut() : () => void signIn()}
             >
               {sessionData ? "Sign out" : "Sign in"}
