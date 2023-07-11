@@ -1,5 +1,6 @@
 import React from "react";
 import { useSession } from "next-auth/react";
+import FeatherIcon from "feather-icons-react";
 import { type RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
 
@@ -13,20 +14,26 @@ function TweetItem({ tweet }: TweetItemProps) {
   const { data: sessionData } = useSession();
   const mutation = api.tweet.delete.useMutation();
   const handleDelete = () => {
-    mutation.mutate({ id: tweet.id });
+    if (confirm("Are you sure to delete the tweet?")) {
+      mutation.mutate({ id: tweet.id });
+    }
   };
 
   return (
-    <div className="rounded-lg bg-white p-4 shadow-md">
-      <p className="text-lg font-semibold text-blue-500">
-        {tweet.user.name} - {tweet.createdAt.toDateString()}
+    <div className="w-full rounded-lg bg-white p-4 shadow-md">
+      <p className="text-base text-sm font-semibold text-gray-600">
+        <span className="font-semibold text-blue-500">{tweet.user.name}</span> -{" "}
+        {tweet.createdAt.toDateString()}
       </p>
-      <p className="text-gray-700">{tweet.content}</p>
-      {sessionData && (
-        <button className="text-red-500" onClick={handleDelete}>
-          Delete Tweet
-        </button>
-      )}
+
+      <div className="w-100 mb-2 flex items-center justify-between">
+        <p className="text-lg text-gray-700">{tweet.content}</p>
+        {sessionData && (
+          <button className="text-blue-500" onClick={handleDelete}>
+            <FeatherIcon size={18} icon="trash-2" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

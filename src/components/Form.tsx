@@ -12,14 +12,17 @@ const Form: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      className="box-border flex w-full flex-col items-center"
+    >
       <textarea
         value={text}
         onChange={(event) => setText(event.target.value)}
         placeholder="What's happening?"
         maxLength={280}
         rows={3}
-        className="mb-2 resize-none rounded border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+        className="mb-2 w-full resize-none rounded border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
       />
       <button
         type="submit"
